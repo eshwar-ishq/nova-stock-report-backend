@@ -30,13 +30,19 @@ app.listen(PORT, () => {
 })
 
 const sql_query = 'select * from stockandmanagement.Inventory';
+const combinedstocks = `select i.id, i.MSKU, i.Item_name, i.Quantity, tl.LocationName, tb.Brand , tpc.Product_Category, tc.category, i.Purchase_amt,
+                            i.Item_Amount, i.Batch, i.Manf_date, i.Expiry_date, i.Date_modified, i.Available_Qty, i.Blocked_Qty, i.Sheet_name  from Inventory i 
+    left join tbl_brands tb on tb.idno = i.Brand 
+    left join tbl_product_category tpc on tpc.idno = i.Product_Category 
+    left join tbl_category tc on tc.idno = i.Category 
+    left join tbl_location tl on tl.LocationId = i.Location`;
 
 app.get('/allpmcstocks', (req, res) => {
     let page = Number(req.query.page) ;
     let limit = Number(req.query.limit) ;
     let offset = (page - 1) * limit;
 
-    connection.query(sql_query, (err, result) => {
+    connection.query(combinedstocks, (err, result) => {
         if (err) {
             console.log('error is fetcing data')
         }
@@ -46,53 +52,54 @@ app.get('/allpmcstocks', (req, res) => {
         // const final = result.slice(offset, offset + limit);
         // console.log(final, numberOfItem = final.length);
         return res.json(result);
-        // return res.json(result);
-
-        // if (keys.length === 0) return res.json({result, NumberOfItems: result.length});
-        // let finalResult = result;
-
-        
-
-        // keys.forEach(key => {
-        //     finalResult = finalResult.filter((record) => record[key]?.toString() === req.query[key]);
-        // })
-        // let finalFetchedResult = finalResult.slice(offset, offset + limit);
-        // console.log(offset)
-        // console.log(limit)
-        // return res.json({finalFetchedResult, NumberOfItems: finalFetchedResult.length});
     })
 })
 
 
-app.get('/pmsstock/:Location', (req, res) => {
+app.get('/combinedstocks/:LocationName', (req, res) => {
     let page = Number(req.query.page) ;
     let limit = Number(req.query.limit) ;
     let offset = (page - 1) * limit;
-
-    // const sql_query1 = `SELECT * FROM stockandmanagement.Inventory LIMIT ${limit} OFFSET ${offset} `;
-
-    connection.query(sql_query, (err, result) => {
+    
+    connection.query(combinedstocks, (err, result) => {
         if (err) {
-            console.log('error is fetcing data')
+            console.log("error in stock brand api", err)
         }
-        const keys = Object.keys(req.query);
-        // console.log(req.query)
-        // console.log(req.params)
-        // let query = req.query;
-
-        const storedData = result.filter((item) => item.Location.toString() === req.params.Location);
-        
-        return res.json(storedData.slice(offset, offset + limit))
-        // return res.json({storedData, NumberOfItems: storedData.length});
-        // if ((req.params.Location == 19) || (req.params.Location == 20) || (req.params.Location == 17) || (req.params.Location == 1)){
-        //     console.log('if condition is true')
-        //     return res.json({storedData, NumberOfItems: storedData.length});
-        // } else{
-        //     return res.json(storedData.slice(offset, offset + limit))
-        // }
-
+        const storedData = result.filter((item) => item.LocationName.toString() === req.params.LocationName);
+        return res.json(storedData.slice(offset, offset + limit));
     })
 })
+
+
+// app.get('/pmsstock/:Location', (req, res) => {
+//     let page = Number(req.query.page) ;
+//     let limit = Number(req.query.limit) ;
+//     let offset = (page - 1) * limit;
+
+//     // const sql_query1 = `SELECT * FROM stockandmanagement.Inventory LIMIT ${limit} OFFSET ${offset} `;
+
+//     connection.query(sql_query, (err, result) => {
+//         if (err) {
+//             console.log('error is fetcing data')
+//         }
+//         const keys = Object.keys(req.query);
+//         // console.log(req.query)
+//         // console.log(req.params)
+//         // let query = req.query;
+
+//         const storedData = result.filter((item) => item.Location.toString() === req.params.Location);
+        
+//         return res.json(storedData.slice(offset, offset + limit))
+//         // return res.json({storedData, NumberOfItems: storedData.length});
+//         // if ((req.params.Location == 19) || (req.params.Location == 20) || (req.params.Location == 17) || (req.params.Location == 1)){
+//         //     console.log('if condition is true')
+//         //     return res.json({storedData, NumberOfItems: storedData.length});
+//         // } else{
+//         //     return res.json(storedData.slice(offset, offset + limit))
+//         // }
+
+//     })
+// })
 
 	// app.get('/all/:Location', (req, res) => {
 //     let page = req.query.page;
