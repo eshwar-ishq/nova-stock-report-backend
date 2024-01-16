@@ -37,6 +37,7 @@ const combinedstocks = `select i.id, i.MSKU, i.Item_name, i.Quantity, tl.Locatio
     left join tbl_category tc on tc.idno = i.Category 
     left join tbl_location tl on tl.LocationId = i.Location`;
 
+    //  Below code is used for satic website
 app.get('/allpmcstocks/:LocationName', (req, res) => {
     let page = Number(req.query.page) ;
     let limit = Number(req.query.limit) ;
@@ -57,6 +58,37 @@ app.get('/allpmcstocks/:LocationName', (req, res) => {
 })
 
 
+//  Below code is used for dynamic website (ReactJs)
+app.get("/all", (req, res) => {
+    let page = Number(req.query.page) || 1;
+    let limit = Number(req.query.limit) || 30;
+    let offset = (page - 1) * limit;
+    const LocationName = req.query.LocationName;
+
+    console.log("LocationName from frontend:", LocationName);
+
+    connection.query(combinedstocks, (err, result) => {
+        if (err) {
+            console.log(err, "error in / url");
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        let filteredData = result;
+
+        if (LocationName) {
+            // Filter only if LocationName is provided (case-insensitive and trim)
+            filteredData = result.filter(
+                item => item.LocationName.trim().toLowerCase() === LocationName.trim().toLowerCase()
+            );
+        }
+
+        // return res.json(filteredData.slice(offset, offset + limit));
+        return res.json(filteredData)
+    });
+});
+
+
+//  Below code is used for satic website
 app.get('/combinedstocks/:LocationName', (req, res) => {
     let page = Number(req.query.page) ;
     let limit = Number(req.query.limit) ;
@@ -70,42 +102,3 @@ app.get('/combinedstocks/:LocationName', (req, res) => {
         return res.json(storedData.slice(offset, offset + limit));
     })
 })
-
-	// app.get('/all/:Location', (req, res) => {
-//     let page = req.query.page;
-//     let limit = req.query.limit || 20;
-//     let offset = (page - 1) * limit;
-
-//     connection.query(sql_query, (err, result) => {
-//         if (err) console.log(err, 'connection error')
-
-//         const keys = Object.keys(req.query);
-//         let finalResult = result;
-
-//         if (req.params.Location !== 0) {
-//             const storedData = result.filter((item) => item.Location.toString() === req.params.Location);
-//             // console.log(storedData)
-//             // const storedFetchedData = storedData.slice(offset, offset + limit)
-//             // console.log(offset,limit)
-//             return res.send({ storedData, NumberOfItems: storedData.length });
-
-//         } else if ((req.params.Location !== 0) && (req.query.page !== 0)) {
-//             keys.forEach(key => {
-//                 finalResult = finalResult.filter((record) => record[key]?.toString() === req.query[key]);
-//             })
-//             let finalFetchedResult = finalResult.slice(offset, offset + limit);
-//             return res.json({finalFetchedResult, NumberOfItems: finalFetchedResult.length});
-
-//             // const storedData = result.filter((item) => item.Location.toString() === req.params.Location);
-//             // const storedFetchedData = storedData.slice(offset, offset + limit)
-//             // return res.json(storedFetchedData);
-//         } else {
-//             // const storedData = result.filter((item) => item.Location.toString() === req.params.Location);
-//             return res.json({result,  NumberOfItems: result.length})
-//         }
-//         // const storedData = result.filter((item) => item.Location.toString() === req.params.Location);
-//         // const storedFetchedData = storedData.slice(offset, offset * limit)
-//         // return res.json({storedFetchedData, NumberOfItems: storedFetchedData.length});
-
-//     })
-// })
