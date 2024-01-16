@@ -89,16 +89,16 @@ app.get("/all", (req, res) => {
 
 
 //  Below code is used for satic website
-app.get('/combinedstocks/:LocationName', (req, res) => {
-    let page = Number(req.query.page) ;
-    let limit = Number(req.query.limit) ;
-    let offset = (page - 1) * limit;
+// app.get('/combinedstocks/:LocationName', (req, res) => {
+//     let page = Number(req.query.page) ;
+//     let limit = Number(req.query.limit) ;
+//     let offset = (page - 1) * limit;
     
-    connection.query(combinedstocks, (err, result) => {
-        if (err) {
-            console.log("error in stock brand api", err)
-        }
-        const storedData = result.filter((item) => item.LocationName.toString() === req.params.LocationName);
-        return res.json(storedData.slice(offset, offset + limit));
-    })
-})
+//     connection.query(combinedstocks, (err, result) => {
+//         if (err) {
+//             console.log("error in stock brand api", err)
+//         }
+//         const storedData = result.filter((item) => item.LocationName.toString() === req.params.LocationName);
+//         return res.json(storedData.slice(offset, offset + limit));
+//     })
+// })
