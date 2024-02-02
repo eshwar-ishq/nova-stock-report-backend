@@ -65,7 +65,7 @@ app.get("/all", (req, res) => {
     let offset = (page - 1) * limit;
     const LocationName = req.query.LocationName;
 
-    console.log("LocationName from frontend:", LocationName);
+    // console.log("LocationName from frontend:", LocationName);
 
     connection.query(combinedstocks, (err, result) => {
         if (err) {
